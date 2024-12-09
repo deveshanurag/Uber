@@ -209,3 +209,156 @@ curl -X POST http://localhost:3000/users/register \
 - Add proper logging and error handling in production for debugging and monitoring.
 
 ---
+
+# **User Login API**
+
+## **Overview**
+
+The `/users/login` endpoint allows registered users to log in by providing their email and password. Upon successful login, the API returns a JSON Web Token (JWT) for authentication in subsequent requests.
+
+---
+
+## **Endpoint**
+
+**`POST /users/login`**
+
+---
+
+## **Request Format**
+
+### **Headers**
+
+| Key          | Value              |
+| ------------ | ------------------ |
+| Content-Type | `application/json` |
+
+### **Body Parameters**
+
+| Field      | Type   | Required | Description                                      |
+| ---------- | ------ | -------- | ------------------------------------------------ |
+| `email`    | String | Yes      | The registered email address of the user.        |
+| `password` | String | Yes      | The password associated with the user's account. |
+
+**Example Request Body**:
+
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "securepassword123"
+}
+```
+
+---
+
+## **Response Format**
+
+### **Success Response**
+
+| Field     | Type    | Description                                              |
+| --------- | ------- | -------------------------------------------------------- |
+| `success` | Boolean | Indicates if the operation was successful.               |
+| `user`    | Object  | Contains user details (excluding sensitive information). |
+| `token`   | String  | JWT token for authentication.                            |
+
+**Example Success Response**:
+
+```json
+{
+  "success": true,
+  "user": {
+    "id": "64f5b8d0b9c8e0c8f8a97f65",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "john.doe@example.com"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxMjM0NTY3ODkwIiwiaWF0IjoxNjE2MjM5MDIyfQ.sflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+}
+```
+
+### **Error Responses**
+
+#### **1. Validation Error**
+
+- **HTTP Status Code**: `400 Bad Request`
+- **Description**: Input validation failed.
+
+**Example Response**:
+
+```json
+{
+  "errors": [
+    {
+      "msg": "Invalid email address",
+      "param": "email",
+      "location": "body"
+    }
+  ]
+}
+```
+
+#### **2. Unauthorized - Invalid Credentials**
+
+- **HTTP Status Code**: `401 Unauthorized`
+- **Description**: The provided email or password is incorrect.
+
+**Example Response**:
+
+```json
+{
+  "success": false,
+  "message": "Unauthorized: Incorrect credentials"
+}
+```
+
+#### **3. Server Error**
+
+- **HTTP Status Code**: `500 Internal Server Error`
+- **Description**: An unexpected error occurred.
+
+**Example Response**:
+
+```json
+{
+  "success": false,
+  "message": "An unexpected error occurred"
+}
+```
+
+---
+
+## **Validation Rules**
+
+- `email`: Must be a valid email address.
+- `password`: Cannot be empty.
+
+---
+
+## **Usage Instructions**
+
+### **Prerequisites**
+
+1. A registered user account with valid credentials.
+2. Obtain the JWT token after login to authenticate further requests.
+
+### **Example cURL Command**
+
+```bash
+curl -X POST \
+  http://localhost:3000/users/login \
+  -H "Content-Type: application/json" \
+  -d '{
+        "email": "john.doe@example.com",
+        "password": "securepassword123"
+      }'
+```
+
+---
+
+## **Notes**
+
+- Ensure your `.env` file contains the `JWT_SECRET` environment variable to sign the JWT tokens.
+- Use the token in the `Authorization` header (format: `Bearer <token>`) for subsequent authenticated API calls.
+
+---
