@@ -362,3 +362,152 @@ curl -X POST \
 - Use the token in the `Authorization` header (format: `Bearer <token>`) for subsequent authenticated API calls.
 
 ---
+
+Here’s the **README.md** file detailing both the `/users/profile` and `/users/logout` routes, one by one:
+
+---
+
+## GET /users/profile\*\*
+
+### **Description**
+
+Fetch the profile of the currently authenticated user. The request must include a valid JWT token in the `Authorization` header or cookies.
+
+### **Endpoint**
+
+**`GET /users/profile`**
+
+### **Headers**
+
+| Key           | Value                       |
+| ------------- | --------------------------- |
+| Authorization | `Bearer <token>` (Required) |
+
+### **Response Format**
+
+#### **Success Response**
+
+| Field        | Type   | Description                     |
+| ------------ | ------ | ------------------------------- |
+| `fullname`   | Object | The user's first and last name. |
+| `email`      | String | The user's email address.       |
+| Other Fields | -      | Additional user information.    |
+
+**Example Success Response**:
+
+```json
+{
+  "_id": "64f5b8d0b9c8e0c8f8a97f65",
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
+  "email": "john.doe@example.com"
+}
+```
+
+#### **Error Response**
+
+##### **1. Unauthorized**
+
+- **HTTP Status Code**: `401 Unauthorized`
+- **Description**: Token is missing, invalid, or blacklisted.
+
+**Example Response**:
+
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+---
+
+## GET /users/logout\*\*
+
+### **Description**
+
+Logs out the authenticated user by blacklisting their JWT token. The token is invalidated for 24 hours or the duration of its expiry.
+
+### **Endpoint**
+
+**`GET /users/logout`**
+
+### **Headers**
+
+| Key           | Value                       |
+| ------------- | --------------------------- |
+| Authorization | `Bearer <token>` (Required) |
+
+### **Response Format**
+
+#### **Success Response**
+
+| Field     | Type   | Description                    |
+| --------- | ------ | ------------------------------ |
+| `message` | String | Confirmation of logout action. |
+
+**Example Success Response**:
+
+```json
+{
+  "message": "Logged out"
+}
+```
+
+#### **Error Response**
+
+##### **1. Unauthorized**
+
+- **HTTP Status Code**: `401 Unauthorized`
+- **Description**: Token is missing, invalid, or blacklisted.
+
+**Example Response**:
+
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+---
+
+## **Authentication Mechanism**
+
+1. **Token Validation**:
+   - Tokens are verified using `jsonwebtoken`.
+   - Blacklisted tokens are stored in the database and checked for validity.
+2. **Token Blacklisting**:
+   - Upon logout, the token is stored in a blacklist database with a 24-hour expiry to ensure it cannot be reused.
+
+---
+
+## **Usage Instructions**
+
+### **1. Fetch User Profile**
+
+- Include the JWT token in the `Authorization` header or cookies.
+- Call the `/users/profile` endpoint.
+
+**Example cURL Command**:
+
+```bash
+curl -X GET \
+  http://localhost:3000/users/profile \
+  -H "Authorization: Bearer <your-token>"
+```
+
+### **2. Logout User**
+
+- Include the JWT token in the `Authorization` header or cookies.
+- Call the `/users/logout` endpoint.
+
+**Example cURL Command**:
+
+```bash
+curl -X GET \
+  http://localhost:3000/users/logout \
+  -H "Authorization: Bearer <your-token>"
+```
+
+---
